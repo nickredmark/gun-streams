@@ -174,8 +174,8 @@ export const MessageContent = ({ message, md }) => {
     );
   }
   if (
-    /youtube\.com\/watch/.exec(message.text) ||
-    /youtu\.be\//.exec(message.text)
+    /^(https?:\/\/(www\.)?)?youtube\.com\/watch/.exec(message.text) ||
+    /^(https?:\/\/(www\.)?)?youtu\.be\//.exec(message.text)
   ) {
     return (
       <div className="player-wrapper">
