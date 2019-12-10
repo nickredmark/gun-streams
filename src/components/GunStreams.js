@@ -19,7 +19,7 @@ export const GunStreams = ({ id, priv, epriv, legacy }) => {
   useEffect(() => {
     const gun = Gun({
       localStorage: false,
-      peers: ["https://gunjs.herokuapp.com/gun", "http://nmr.io:8765/gun"],
+      peers: ["https://gunjs.herokuapp.com/gun", "http://nmr.io:8765/gun"]
     });
     gun.get(id).on(onData);
     gun
@@ -53,7 +53,8 @@ export const GunStreams = ({ id, priv, epriv, legacy }) => {
           [messageId, "text", text],
           [messageId, "created", +new Date()],
           [messagesId, key, { "#": messageId }],
-          [id, "lastMessage", { "#": messageId }]
+          [id, "updated", +new Date()],
+          [id, "lastUpdate", text]
         );
       }}
       onUpdateMessage={(id, key, value) => put([id, key, value])}

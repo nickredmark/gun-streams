@@ -97,9 +97,6 @@ export const Streams = ({
       </header>
       <main>
         <div className="content">
-          {stream.messages.length === 0 && stream.lastMessage && (
-            <div>Loading...</div>
-          )}
           {stream.messages.map(message => {
             const id = getId(message);
             return (
