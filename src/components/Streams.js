@@ -43,7 +43,6 @@ export const Streams = ({
       });
     }
   }, [priv]);
-  console.log(md);
 
   if (!md) {
     return <div>Loading...</div>;
