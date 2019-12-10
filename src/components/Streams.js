@@ -81,12 +81,12 @@ export const Streams = ({
             {(stream && stream.name) || "unnamed"}
             <a
               className="stream-permalink"
-              href={`?id=${id}${qs({ priv, epriv }, "#")}`}
+              href={`?id=${id}${qs({ epriv }, "#")}`}
               target="_blank"
               onClick={e => {
                 e.preventDefault();
                 navigator.clipboard.writeText(
-                  `${location.origin}?id=${id}${qs({ priv, epriv }, "#")}`
+                  `${location.origin}?id=${id}${qs({ epriv }, "#")}`
                 );
                 alert("Readonly URL copied to clipboard!");
               }}
