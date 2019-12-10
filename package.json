@@ -19,7 +19,7 @@
     "drag-drop": "^6.0.0",
     "gun": "^0.2019.930",
     "moment": "^2.24.0",
-    "nicks-gun-utils": "^2.0.0",
+    "nicks-gun-utils": "^2.1.0",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-hot-loader": "^4.12.16",
