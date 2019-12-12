@@ -97,19 +97,23 @@ export const Streams = ({
       </header>
       <main>
         <div className="content">
-          {stream.messages.map(message => {
-            const id = getId(message);
-            return (
-              <MessageComponent
-                key={id}
-                id={id}
-                message={message}
-                editable={editable}
-                onUpdateMessage={onUpdateMessage}
-                md={md}
-              />
-            );
-          })}
+          {stream.messages
+            .filter(
+              message => message.text !== null && message.text !== undefined
+            )
+            .map(message => {
+              const id = getId(message);
+              return (
+                <MessageComponent
+                  key={id}
+                  id={id}
+                  message={message}
+                  editable={editable}
+                  onUpdateMessage={onUpdateMessage}
+                  md={md}
+                />
+              );
+            })}
         </div>
       </main>
       {editable && <NewMessage onCreateMessage={onCreateMessage} />}
@@ -205,16 +209,22 @@ export const MessageContent = ({ message, md }) => {
     );
   }
 
-  return (
-    <span
-      style={{
-        ...(message.highlighted && {
-          fontWeight: "bold"
-        })
-      }}
-      dangerouslySetInnerHTML={{ __html: md.render(message.text) }}
-    />
-  );
+  if (typeof message.text === "string") {
+    return (
+      <span
+        style={{
+          ...(message.highlighted && {
+            fontWeight: "bold"
+          })
+        }}
+        dangerouslySetInnerHTML={{
+          __html: message.text && md.render(message.text)
+        }}
+      />
+    );
+  }
+
+  return "[unknown message format]";
 };
 
 export const NewMessage = ({ onCreateMessage }) => {
