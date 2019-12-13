@@ -36,9 +36,7 @@ export const Streams = ({
           if (message.length > 1000000) {
             throw new Error(`File too large: ${message.length}`);
           }
-          await onCreateMessage({
-            text: message
-          });
+          await onCreateMessage(message);
         }
       });
     }
