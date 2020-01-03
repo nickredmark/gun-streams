@@ -10,6 +10,7 @@ export const Streams = ({
   priv,
   epriv,
   parent,
+  legacy,
   onSetStreamName,
   onUpdateMessage,
   onCreateMessage
@@ -20,6 +21,7 @@ export const Streams = ({
   const [newName, setNewName] = useState("");
   const [md, setMd] = useState();
   const [messageId, setMessageId] = useState(false);
+  const message = stream.messages.find(m => getId(m) === messageId);
 
   const name =
     stream.name ||
@@ -45,21 +47,24 @@ export const Streams = ({
   }, [priv]);
 
   useEffect(() => {
-    if (parent && messageId) {
+    if (parent && message) {
       window.parent.postMessage(
         {
           name: window.name,
           type: "open-child",
-          url: `https://nmaro.now.sh/gun-message-context/?id=${id}&messageId=${messageId}`,
+          url: `https://nmaro.now.sh/gun-stream-search/${qs(
+            { id, search: message.text, legacy },
+            "?"
+          )}${hash}`,
           message: {
-            type: "set-message-id",
-            messageId
+            type: "search",
+            search: message.text
           }
         },
         parent
       );
     }
-  }, [messageId]);
+  }, [message]);
 
   if (!md) {
     return <div>Loading...</div>;
