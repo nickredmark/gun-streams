@@ -9,10 +9,11 @@ const App = () => {
   const hashUrlParams = new URLSearchParams(window.location.hash.substr(1));
   const priv = hashUrlParams.get("priv");
   const epriv = hashUrlParams.get("epriv");
+  const parent = hashUrlParams.get("parent");
 
   useEffect(() => {
     if (!id) {
-      window.location = `https://gun-create.nmaro.now.sh?next=${encodeURIComponent(
+      window.location = `https://nmaro.now.sh/gun-create/?next=${encodeURIComponent(
         window.location.origin
       )}`;
     }
@@ -22,7 +23,15 @@ const App = () => {
     return <div>Loading...</div>;
   }
 
-  return <GunStreams id={id} legacy={legacy} priv={priv} epriv={epriv} />;
+  return (
+    <GunStreams
+      id={id}
+      legacy={legacy}
+      priv={priv}
+      epriv={epriv}
+      parent={parent}
+    />
+  );
 };
 
 export default hot(App);

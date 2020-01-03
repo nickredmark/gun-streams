@@ -1,7 +1,7 @@
 
 .cache/
 coverage/
-public/
+public/*
 !public/index.html
 node_modules/
 *.log

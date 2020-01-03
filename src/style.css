@@ -179,10 +179,11 @@ ol {
 }
 
 .message {
-  margin-bottom: 0.5rem;
+  padding: 0.25rem 0;
   overflow-x: auto;
   position: relative;
   clear: both;
+  cursor: pointer;
 }
 .message p {
   margin: 0;
@@ -244,6 +245,15 @@ twitter-widget {
 }
 .message:hover .message-permalink {
   visibility: visible;
+}
+.message:hover::before,
+.message.selected::before {
+  content: "";
+  border-left: 2px solid lightgray;
+  position: absolute;
+  left: -0.75rem;
+  top: 0;
+  height: 100%;
 }
 
 .editable {

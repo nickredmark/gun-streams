@@ -9,6 +9,7 @@ export const Streams = ({
   stream,
   priv,
   epriv,
+  parent,
   onSetStreamName,
   onUpdateMessage,
   onCreateMessage
@@ -18,6 +19,7 @@ export const Streams = ({
   const [editing, setEditing] = useState(false);
   const [newName, setNewName] = useState("");
   const [md, setMd] = useState();
+  const [messageId, setMessageId] = useState(false);
 
   const name =
     stream.name ||
@@ -26,8 +28,8 @@ export const Streams = ({
   useEffect(() => {
     document.title = name;
   }, [name]);
+  const hash = qs({ priv, epriv }, "#");
   useEffect(() => {
-    const hash = qs({ priv, epriv }, "#");
     setMd(getMd({ pub, hash }));
     if (priv) {
       dragDrop("body", async files => {
@@ -36,11 +38,28 @@ export const Streams = ({
           if (message.length > 1000000) {
             throw new Error(`File too large: ${message.length}`);
           }
-          await onCreateMessage(message);
+          setMessageId(onCreateMessage(message));
         }
       });
     }
   }, [priv]);
+
+  useEffect(() => {
+    if (parent && messageId) {
+      window.parent.postMessage(
+        {
+          name: window.name,
+          type: "open-child",
+          url: `https://nmaro.now.sh/gun-message-context/?id=${id}&messageId=${messageId}`,
+          message: {
+            type: "set-message-id",
+            messageId
+          }
+        },
+        parent
+      );
+    }
+  }, [messageId]);
 
   if (!md) {
     return <div>Loading...</div>;
@@ -108,13 +127,19 @@ export const Streams = ({
                   message={message}
                   editable={editable}
                   onUpdateMessage={onUpdateMessage}
+                  selected={messageId === id}
+                  onSelect={() => setMessageId(id)}
                   md={md}
                 />
               );
             })}
         </div>
       </main>
-      {editable && <NewMessage onCreateMessage={onCreateMessage} />}
+      {editable && (
+        <NewMessage
+          onCreateMessage={text => setMessageId(onCreateMessage(text))}
+        />
+      )}
     </>
   );
 };
@@ -127,14 +152,27 @@ const toBase64 = file =>
     reader.onerror = error => reject(error);
   });
 
-const MessageComponent = ({ id, message, editable, onUpdateMessage, md }) => {
+const MessageComponent = ({
+  id,
+  message,
+  editable,
+  onUpdateMessage,
+  md,
+  selected,
+  onSelect
+}) => {
   const ref = useRef(null);
   useEffect(() => {
     ref.current.scrollIntoView();
   }, []);
 
   return (
-    <div id={id} className="message" ref={ref}>
+    <div
+      id={id}
+      className={`message ${selected ? "selected" : ""}`}
+      ref={ref}
+      onClick={() => onSelect()}
+    >
       <a id={id} />
       <MessageContent message={message} md={md} />
       <div className="message-meta">

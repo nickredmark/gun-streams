@@ -9,7 +9,7 @@ require("gun/lib/radisk");
 require("gun/lib/store");
 require("gun/lib/rindexed");
 
-export const GunStreams = ({ id, priv, epriv, legacy }) => {
+export const GunStreams = ({ id, priv, epriv, legacy, parent }) => {
   const [gun, setGun] = useState(null);
   const pub = getPub(id);
   const pair = pub && { pub, priv, epriv };
@@ -45,6 +45,7 @@ export const GunStreams = ({ id, priv, epriv, legacy }) => {
       id={id}
       priv={priv}
       epriv={epriv}
+      parent={parent}
       onSetStreamName={name => put([id, "name", name])}
       onCreateMessage={text => {
         const key = getUUID(gun);
@@ -56,6 +57,7 @@ export const GunStreams = ({ id, priv, epriv, legacy }) => {
           [id, "updated", +new Date()],
           [id, "lastUpdate", text]
         );
+        return messageId;
       }}
       onUpdateMessage={(id, key, value) => put([id, key, value])}
     />
