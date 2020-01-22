@@ -47,7 +47,7 @@ export const GunStreams = ({ id, priv, epriv, legacy, parent }) => {
       epriv={epriv}
       parent={parent}
       legacy={legacy}
-      onSetStreamName={name => put([id, "name", name])}
+      onSetStreamName={(nameField, name) => put([id, nameField, name])}
       onCreateMessage={text => {
         const key = getUUID(gun);
         const messageId = legacy ? `${key}${id}.` : `${id}.messages.${key}`;

@@ -4,6 +4,8 @@ import ReactPlayer from "react-player";
 import { Tweet } from "./Tweet";
 import dragDrop from "drag-drop";
 
+const nameFields = ["name", "title", "text"];
+
 export const Streams = ({
   id,
   stream,
@@ -20,13 +22,21 @@ export const Streams = ({
   const [editing, setEditing] = useState(false);
   const [newName, setNewName] = useState("");
   const [md, setMd] = useState();
-  const [messageId, setMessageId] = useState(false);
+  const [{ messageId, view }, setFocus] = useState(false);
   const message = stream.messages.find(m => getId(m) === messageId);
 
-  const name =
-    stream.name ||
-    id.replace(`~${pub}.`, "").replace(`~${pub}`, "") ||
-    "Stream";
+  let name = stream.name;
+  let nameField = "name";
+  for (const nf of nameFields) {
+    if (stream[nf]) {
+      name = stream[nf];
+      nameField = nf;
+      break;
+    }
+  }
+  if (!name) {
+    name = id.replace(`~${pub}.`, "").replace(`~${pub}`, "") || "Stream";
+  }
   useEffect(() => {
     document.title = name;
   }, [name]);
@@ -47,24 +57,41 @@ export const Streams = ({
   }, [priv]);
 
   useEffect(() => {
-    if (parent && message) {
-      window.parent.postMessage(
-        {
-          name: window.name,
-          type: "open-child",
-          url: `https://nmaro.now.sh/gun-stream-search/${qs(
-            { id, search: message.text, legacy },
-            "?"
-          )}${hash}`,
-          message: {
-            type: "search",
-            search: message.text
-          }
-        },
-        parent
-      );
+    if (parent && message && view) {
+      switch (view) {
+        case "search":
+          window.parent.postMessage(
+            {
+              name: window.name,
+              type: "open-child",
+              url: `https://nmaro.now.sh/gun-stream-search/${qs(
+                { id, search: message.text, legacy },
+                "?"
+              )}${hash}`,
+              message: {
+                type: "search",
+                search: message.text
+              }
+            },
+            parent
+          );
+          break;
+        case "stream":
+          window.parent.postMessage(
+            {
+              name: window.name,
+              type: "open-child",
+              url: `https://nmaro.now.sh/gun-streams/${qs(
+                { id: getId(message) },
+                "?"
+              )}${hash}`
+            },
+            parent
+          );
+          break;
+      }
     }
-  }, [message]);
+  }, [messageId, view]);
 
   if (!md) {
     return <div>Loading...</div>;
@@ -77,7 +104,7 @@ export const Streams = ({
           <form
             onSubmit={e => {
               e.preventDefault();
-              onSetStreamName(newName);
+              onSetStreamName(nameField, newName);
               setEditing(false);
             }}
           >
@@ -99,7 +126,7 @@ export const Streams = ({
               })
             }
           >
-            {(stream && stream.name) || "unnamed"}
+            {name}
             <a
               className="stream-permalink"
               href={`?id=${id}${qs({ epriv }, "#")}`}
@@ -133,7 +160,7 @@ export const Streams = ({
                   editable={editable}
                   onUpdateMessage={onUpdateMessage}
                   selected={messageId === id}
-                  onSelect={() => setMessageId(id)}
+                  onSelect={view => setFocus({ messageId: id, view })}
                   md={md}
                 />
               );
@@ -142,7 +169,9 @@ export const Streams = ({
       </main>
       {editable && (
         <NewMessage
-          onCreateMessage={text => setMessageId(onCreateMessage(text))}
+          onCreateMessage={text =>
+            setFocus({ view: "search", messageId: onCreateMessage(text) })
+          }
         />
       )}
     </>
@@ -176,7 +205,8 @@ const MessageComponent = ({
       id={id}
       className={`message ${selected ? "selected" : ""}`}
       ref={ref}
-      onClick={() => onSelect()}
+      onClick={() => onSelect("stream")}
+      onDoubleClick={() => onSelect("search")}
     >
       <a id={id} />
       <MessageContent message={message} md={md} />
